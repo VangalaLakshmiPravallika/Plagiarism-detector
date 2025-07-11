@@ -2,64 +2,71 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const Submission = require('../models/Submission');
-const { compareSimilarity } = require('../utils/plagiarismChecker');
 const mongoose = require('mongoose');
+const Submission = require('../models/Submission');
+const Course = require('../models/Course');
+const Assignment = require('../models/Assignment');
+const { compareSimilarity } = require('../utils/plagiarismChecker');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
-
 const upload = multer({ dest: 'uploads/' });
 
-router.post('/upload', upload.single('file'), async (req, res) => {
+// ✅ Upload submission (student)
+router.post('/upload', authMiddleware, upload.single('file'), async (req, res) => {
   try {
-    const { studentId, course } = req.body;
+    const { assignmentId } = req.body;
     const file = req.file;
 
-    if (!studentId || !course || !file) {
+    if (!assignmentId || !file) {
       return res.status(400).json({ msg: 'Missing required fields' });
     }
 
-    const newPath = path.join('uploads', file.filename);
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) return res.status(404).json({ msg: 'Assignment not found' });
 
-    // Fetch previous submissions from OTHER students in the same course
+    const courseId = assignment.course;
+    const studentId = req.user._id;
+    const filePath = path.join('uploads', file.filename);
+
+    // Fetch previous submissions from other students for this assignment
     const existing = await Submission.find({
-      course,
+      assignment: assignmentId,
       student: { $ne: studentId }
     }).populate('student');
 
     const compareFiles = existing.map(sub => ({
-  path: sub.filePath,
-  studentId: sub.student._id,
-  studentName: sub.student.name,
-  uploadTime: sub.uploadTime // Include upload time here
-}));
+      path: sub.filePath,
+      studentId: sub.student._id,
+      studentName: sub.student.name,
+      uploadTime: sub.uploadTime
+    }));
 
     let similarityScore = 0;
     let bestMatch = null;
 
     if (compareFiles.length > 0) {
-      const results = await compareSimilarity(newPath, compareFiles);
-      bestMatch = results[0]; // highest match
+      const results = await compareSimilarity(filePath, compareFiles);
+      bestMatch = results[0];
       similarityScore = bestMatch.similarity;
     }
 
-    // Save the submission
     const submission = new Submission({
-  student: studentId,
-  course,
-  filePath: newPath,
-  uploadTime: new Date(),
-  similarityScore,
-  similarToStudentName: bestMatch?.studentName || null // ✅ NEW FIELD
-});
+      student: studentId,
+      course: courseId,
+      assignment: assignmentId,
+      filePath,
+      similarityScore,
+      uploadTime: new Date()
+    });
 
     await submission.save();
 
     return res.json({
-  msg: "Assignment submitted with plagiarism check",
-  score: similarityScore,
-  matchedStudent: bestMatch?.studentName || null
-});
+      msg: "Assignment submitted with plagiarism check",
+      score: similarityScore,
+      matchedStudent: bestMatch?.studentName || null
+    });
 
   } catch (err) {
     console.error(err);
@@ -67,28 +74,41 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// Add this route to return similarity report for a specific student
-router.get('/similarity/:studentId', async (req, res) => {
+// ✅ Get all submissions
+router.get('/all', authMiddleware, async (req, res) => {
+  try {
+    const submissions = await Submission.find()
+      .populate('student', 'name email')
+      .populate('assignment', 'title')
+      .populate('course', 'courseCode courseName');
+    res.json(submissions);
+  } catch (err) {
+    console.error('Error fetching submissions:', err);
+    res.status(500).json({ msg: 'Failed to fetch submissions' });
+  }
+});
+
+// ✅ Get similarity comparisons for a student (for faculty)
+router.get('/similarity/:studentId', authMiddleware, async (req, res) => {
   const { studentId } = req.params;
+  const { courseId } = req.query;
 
   try {
-    // Get submissions by this student
-    const studentSubmissions = await Submission.find({ student: studentId });
+    const studentSubmissions = await Submission.find({ student: studentId, course: courseId });
 
     const comparisons = [];
 
     for (let sub of studentSubmissions) {
-      const existing = await Submission.find({
-        course: sub.course,
+      const others = await Submission.find({
+        assignment: sub.assignment,
         student: { $ne: studentId }
       }).populate('student');
 
-      const compareFiles = existing.map(e => ({
+      const compareFiles = others.map(e => ({
         path: e.filePath,
         studentId: e.student._id,
         studentName: e.student.name,
-        uploadTime: e.uploadTime,
-        course: e.course
+        uploadTime: e.uploadTime
       }));
 
       if (compareFiles.length > 0) {
@@ -97,50 +117,34 @@ router.get('/similarity/:studentId', async (req, res) => {
         results.forEach(result => {
           comparisons.push({
             name: result.studentName,
-            similarity: result.similarity * 100, // Convert to percentage
+            similarity: result.similarity * 100,
             uploadTime: result.uploadTime,
-            course: result.course
+            assignment: sub.assignment
           });
         });
       }
     }
 
-    // Sort by similarity descending
-    comparisons.sort((a, b) => b.similarity - a.similarity);
-
-    res.json({ comparisons });
+    return res.json({ comparisons });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: "Failed to calculate similarity" });
+    return res.status(500).json({ msg: "Similarity check failed" });
   }
 });
 
-
-router.get('/courses', async (req, res) => {
+// ✅ Get unique list of students in a course (for dropdown)
+router.get('/students/:courseId', authMiddleware, async (req, res) => {
   try {
-    const courses = await Submission.distinct('course');
-    res.json(courses);
-  } catch (err) {
-    res.status(500).json({ msg: 'Failed to fetch courses' });
-  }
-});
-
-// Get students for a course
-router.get('/students/:course', async (req, res) => {
-  try {
-    const course = req.params.course;
-    const students = await Submission.find({ course }).populate('student');
+    const students = await Submission.find({ course: req.params.courseId }).populate('student');
     
     const uniqueStudents = [];
     const seen = new Set();
+
     for (let sub of students) {
       if (!seen.has(sub.student._id.toString())) {
         seen.add(sub.student._id.toString());
-        uniqueStudents.push({
-          id: sub.student._id,
-          name: sub.student.name
-        });
+        uniqueStudents.push({ id: sub.student._id, name: sub.student.name });
       }
     }
 
@@ -150,14 +154,15 @@ router.get('/students/:course', async (req, res) => {
   }
 });
 
-module.exports = router;
-router.get('/all', async (req, res) => {
+// ✅ List all distinct courses in submissions
+router.get('/courses', authMiddleware, async (req, res) => {
   try {
-    const submissions = await Submission.find().populate('student');
-    res.json(submissions);
+    const courseIds = await Submission.distinct('course');
+    const courses = await Course.find({ _id: { $in: courseIds } });
+    res.json(courses);
   } catch (err) {
-    console.error('Error fetching submissions:', err);
-    res.status(500).json({ msg: 'Failed to fetch submissions' });
+    res.status(500).json({ msg: 'Failed to fetch courses' });
   }
 });
 
+module.exports = router;
