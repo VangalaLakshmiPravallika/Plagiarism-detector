@@ -1,0 +1,345 @@
+/* Base Styles with Animated Background */
+.faculty-dashboard {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  color: #2d3748;
+}
+
+.dashboard-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  overflow: hidden;
+}
+
+.bg-blob-1, .bg-blob-2, .bg-blob-3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.15;
+  animation: blob-move 25s infinite alternate;
+}
+
+.bg-blob-1 {
+  width: 500px;
+  height: 500px;
+  background: #4f46e5;
+  top: -100px;
+  left: -100px;
+}
+
+.bg-blob-2 {
+  width: 400px;
+  height: 400px;
+  background: #10b981;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: 8s;
+}
+
+.bg-blob-3 {
+  width: 300px;
+  height: 300px;
+  background: #f59e0b;
+  top: 50%;
+  left: 30%;
+  animation-delay: 15s;
+}
+
+@keyframes blob-move {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(50px, 50px); }
+  50% { transform: translate(-30px, 80px); }
+  75% { transform: translate(80px, -30px); }
+  100% { transform: translate(-50px, -50px); }
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Header Styles */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #4f46e5, #10b981);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.dashboard-subtitle {
+  color: #64748b;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Selection Cards */
+.selection-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.selection-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.selection-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.selection-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #4f46e5;
+}
+
+/* Pill Navigation */
+.pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.course-pill {
+  padding: 0.75rem 1.25rem;
+  background: #f1f5f9;
+  border-radius: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.course-pill:hover {
+  background: #e2e8f0;
+}
+
+.course-pill.active {
+  background: #4f46e5;
+  color: white;
+}
+
+.pill-close {
+  transition: all 0.2s ease;
+}
+
+.course-pill.active:hover .pill-close {
+  transform: rotate(90deg);
+}
+
+/* Enhanced Select */
+.search-select {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.enhanced-select {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 1rem;
+  color: #1e293b;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #a5b4fc, inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Results Glass Panel */
+.results-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Result Cards */
+.result-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.student-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.result-header h4 {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.result-header p {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Similarity Gauge */
+.similarity-gauge {
+  height: 2rem;
+  background: #f1f5f9;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.similarity-percent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+  font-size: 0.875rem;
+  z-index: 2;
+  color: #1e293b; 
+  text-shadow: 0 0 2px rgba(255,255,255,0.3); 
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 1rem;
+  position: relative;
+  transition: width 0.5s ease;
+}
+
+.gauge-fill.high {
+  background: linear-gradient(90deg, #fca5a5, #ef4444);
+}
+
+.gauge-fill.medium {
+  background: linear-gradient(90deg, #fcd34d, #f59e0b);
+}
+
+.gauge-fill.low {
+  background: linear-gradient(90deg, #86efac, #10b981);
+}
+
+.similarity-gauge span {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+  }
+  
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}
