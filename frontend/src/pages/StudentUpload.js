@@ -7,7 +7,6 @@ function StudentUpload() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
 
-  // Load courses assigned to the logged-in faculty
   useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_API}/api/auth/faculty-courses`, {

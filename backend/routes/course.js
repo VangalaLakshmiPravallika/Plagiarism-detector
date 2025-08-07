@@ -49,7 +49,7 @@ router.post('/upload-csv', authMiddleware, upload.single('file'), async (req, re
           insertedCourses.push(newCourse);
         }
 
-        fs.unlinkSync(req.file.path); // cleanup
+        fs.unlinkSync(req.file.path); 
         res.json({ msg: 'Courses created', inserted: insertedCourses });
       } catch (err) {
         fs.unlinkSync(req.file.path);
@@ -85,14 +85,15 @@ router.post('/create-course', authMiddleware, async (req, res) => {
   }
 });
 
-router.get('/:courseCode/assignments', async (req, res) => {
-  const { courseCode } = req.params;
+router.get('/:courseId/assignments', async (req, res) => {
+  const { courseId } = req.params;
+
   try {
-    const course = await Course.findOne({ courseCode });
-    if (!course) return res.status(404).json({ msg: 'Course not found' });
-    res.json({ assignments: course.assignments });
+    const assignments = await Assignment.find({ course: courseId }).populate('submissions.student', 'name email');
+    res.json({ assignments });
   } catch (err) {
-    res.status(500).json({ msg: 'Error fetching assignments' });
+    console.error('Error fetching assignments:', err);
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 

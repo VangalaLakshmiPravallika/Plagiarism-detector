@@ -74,5 +74,4 @@ router.post('/upload/:courseId', authMiddleware, upload.single('file'), async (r
   }
 });
 
-// ✅ Only one export. No duplication.
 module.exports = router;

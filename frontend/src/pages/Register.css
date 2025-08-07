@@ -1,4 +1,4 @@
-/* Base styles */
+
 .register-container {
   min-height: 100vh;
   display: flex;
@@ -10,7 +10,6 @@
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 
-/* Background blobs */
 .register-bg-blobs {
   position: absolute;
   inset: 0;
@@ -63,7 +62,6 @@
   75% { transform: translate(5%, 5%) scale(1.05); }
 }
 
-/* Particles */
 .register-particles {
   position: absolute;
   inset: 0;
@@ -85,7 +83,6 @@
   50% { transform: translateY(-20px) translateX(5px); }
 }
 
-/* Success notification */
 .register-success-notification {
   position: fixed;
   top: 1rem;
@@ -112,7 +109,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Card container */
 .register-card-container {
   width: 100%;
   max-width: 28rem;
@@ -134,7 +130,6 @@
   overflow: hidden;
 }
 
-/* Header */
 .register-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -172,7 +167,6 @@
   font-size: 0.9rem;
 }
 
-/* Form */
 .register-form {
   display: flex;
   flex-direction: column;
@@ -238,7 +232,6 @@
   width: 100%;
 }
 
-/* Button */
 .register-submit-btn {
   width: 100%;
   padding: 1rem;
@@ -297,7 +290,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Footer */
 .register-footer {
   margin-top: 1.5rem;
   text-align: center;
@@ -320,7 +312,6 @@
   text-decoration: underline;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 480px) {
   .register-card {
     padding: 1.5rem;

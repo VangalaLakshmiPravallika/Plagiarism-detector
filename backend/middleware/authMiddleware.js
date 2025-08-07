@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const authMiddleware = async (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Bearer <token>
+  const token = req.header('Authorization')?.split(' ')[1]; 
 
   if (!token) return res.status(401).json({ msg: 'No token, access denied' });
 
@@ -11,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
     const user = await User.findById(decoded.id).select('-password');
     if (!user) return res.status(401).json({ msg: 'Invalid user' });
 
-    req.user = user; // attach user to request
+    req.user = user; 
     next();
   } catch (err) {
     console.error(err);

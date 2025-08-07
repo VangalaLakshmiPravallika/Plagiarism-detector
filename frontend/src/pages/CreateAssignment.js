@@ -16,16 +16,16 @@ function CreateAssignment() {
     setMessage('');
     try {
       const res = await axios.post(`${process.env.REACT_APP_API}/api/courses/create-assignment`, form);
-      setMessage('✅ Assignment created for ' + res.data.course.courseCode);
+      setMessage(' Assignment created for ' + res.data.course.courseCode);
     } catch (err) {
       console.error(err);
-      setMessage('❌ Failed to create assignment');
+      setMessage(' Failed to create assignment');
     }
   };
 
   return (
     <div style={{ maxWidth: '400px', margin: 'auto' }}>
-      <h2>📝 Create Assignment</h2>
+      <h2> Create Assignment</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"

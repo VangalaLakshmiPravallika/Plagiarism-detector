@@ -3,7 +3,7 @@ const router = express.Router();
 const Assignment = require('../models/Assignment');
 const Course = require('../models/Course');
 const User = require('../models/User');
-const authMiddleware = require('../middleware/authMiddleware'); // make sure this is imported
+const authMiddleware = require('../middleware/authMiddleware'); 
 
 function isFaculty(req, res, next) {
   console.log("🔍 Checking faculty access. req.user =", req.user);

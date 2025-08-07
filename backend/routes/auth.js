@@ -3,12 +3,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
-const Course = require('../models/Course'); // ✅ Add this
-
+const Course = require('../models/Course'); 
 
 const router = express.Router();
 
-// ✅ Register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -31,7 +29,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// ✅ Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -69,18 +66,17 @@ router.get('/faculty-courses', authMiddleware, async (req, res) => {
       return res.status(403).json({ msg: 'Only faculty can access this' });
     }
 
-    console.log("Authenticated user:", req.user); // 🔍 Log user
+    console.log("Authenticated user:", req.user); 
 
     const courses = await Course.find({ faculty: req.user._id });
     res.json({ courses });
   } catch (err) {
-    console.error("Error in /faculty-courses:", err); // 🔍 Log full error
-    res.status(500).json({ msg: 'Server error', error: err.message }); // Optional: include err.message
+    console.error("Error in /faculty-courses:", err); 
+    res.status(500).json({ msg: 'Server error', error: err.message }); 
   }
 });
 
 
-// ✅ Get current logged-in user
 router.get('/me', authMiddleware, (req, res) => {
   res.json(req.user);
 });
